@@ -1,5 +1,5 @@
 /*
-  LoRa RA-02 SX1278 Sample Code --> Sender
+  LoRa RA-02 SX1278 Sample Code --> MASTER DEVICE Receiver
   Date: 11-07-2023
 
   CONNECTIONS (Arduino Uno / Arduino Nano)
@@ -17,65 +17,75 @@
   NOTE: For STABILITY Connect All GND pin on the LoRa to the Arduino GND
 */
 
-
 #include <SPI.h>
 #include <LoRa.h>
+
 
 uint8_t ss = 10;   //LoRa SPI Chip Select Pin
 uint8_t dio0 = 2;  //LoRa DIO0 Pin
 uint8_t rst = 9;   //LoRa Reset Pin
 
-
 struct data_encrypt {
-  uint8_t id = 0x01;
-  uint8_t sampeUI8=0x55;
-  //float sampleF = 1.23;
-  //String sampleS = "Hello World";
+  uint8_t id = 0x00;
+  uint8_t sampeUI8 = 0x00;
+  float sampleF = 00.000000;
+  String sampleS = "EMPTY";
 };
 
 typedef struct data_encrypt Data_en;
 
 Data_en payload;
 
-int datasize = sizeof(struct data_encrypt);
-
-int counter = 0;
-
 void setup() {
   Serial.begin(115200);
   while (!Serial)
     ;
 
-  Serial.println("LoRa Sender\n\n\n");
+  Serial.println("GeoFence MASTER DEVICE");
+
   LoRa.setPins(ss, rst, dio0);
-  if (!LoRa.begin(433E6)) {
+
+  if (!LoRa.begin(433E6)) {  //use (915E6) for LoRa Ra-02 915 MHz
     Serial.println("Starting LoRa failed!");
     while (1)
       ;
   }
-
-  Serial.println("###############################");
-  Serial.println("Data Encryption Test\n\n");
-  Serial.print("Data ID: ");
-  Serial.println(payload.id);
-  Serial.print("Data Sample UINT8_T: ");
-  Serial.println(payload.sampeUI8);
-  //Serial.print("Data Sample Float: ");
-  //Serial.println(payload.sampleF);
-  //Serial.print("Data Sample String:");
-  //Serial.println(payload.sampleS);
-  Serial.println("###############################");
 }
 
 void loop() {
-  Serial.print("\n\n\nSending packet: ");
-  Serial.write((uint8_t*)&payload, sizeof(payload));
+  // try to parse packet
+  /*int packetSize = LoRa.parsePacket();
+  if (packetSize) {
+    // received a packet
+    Serial.print("Received packet '");
 
+    // read packet
+    while (LoRa.available()) {
+      Serial.print((char)LoRa.read());
+    }
 
-  // send packet
-  LoRa.beginPacket();
-  LoRa.write((uint8_t*)&payload, sizeof(payload));
-  LoRa.endPacket();
+    // print RSSI of packet
+    Serial.print("' with RSSI ");
+    Serial.println(LoRa.packetRssi());
+  }*/
 
-  delay(2000);
+  int packetSize = LoRa.parsePacket();
+  if (packetSize)  // Only read if there is some data to read..
+  {
+    LoRa.readBytes((uint8_t *)&payload, packetSize);
+    Serial.println("Received packet:");
+    Serial.write((uint8_t *)&payload, sizeof(payload));
+    Serial.print("\n\n\n");
+    Serial.println("###############################");
+    Serial.println("Data Decryption Test\n\n");
+    Serial.print("Data ID: ");
+    Serial.println(payload.id, HEX);
+    Serial.print("Data Sample UINT8_T: ");
+    Serial.println(payload.sampeUI8, HEX);
+    Serial.print("Data Sample Float: ");
+    Serial.println(payload.sampleF);
+    Serial.print("Data Sample String:");
+    Serial.println(payload.sampleS);
+    Serial.println("###############################");
+  }
 }
