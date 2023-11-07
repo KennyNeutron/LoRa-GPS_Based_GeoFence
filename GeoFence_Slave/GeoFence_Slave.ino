@@ -30,7 +30,7 @@ struct data_encrypt {
   uint8_t id = 0x01;
   uint8_t sampeUI8 = 0x55;
   float sampleF = 33.123456;
-  String sampleS = "Hello World";
+  //String sampleS = "Hello World";
 };
 
 typedef struct data_encrypt Data_en;
@@ -48,7 +48,7 @@ void setup() {
     ;
 
   Serial.println("GeoFence MASTER DEVICE\n\n\n");
-  
+
   LoRa.setPins(ss, rst, dio0);
   if (!LoRa.begin(433E6)) {
     Serial.println("Starting LoRa failed!");
@@ -63,9 +63,9 @@ void setup() {
   Serial.print("Data Sample UINT8_T: ");
   Serial.println(payload.sampeUI8);
   Serial.print("Data Sample Float: ");
-  Serial.println(payload.sampleF);
-  Serial.print("Data Sample String:");
-  Serial.println(payload.sampleS);
+  Serial.println(payload.sampleF, 6);
+  //Serial.print("Data Sample String:");
+  //Serial.println(payload.sampleS);
   Serial.println("###############################");
 }
 

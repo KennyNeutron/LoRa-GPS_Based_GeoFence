@@ -28,8 +28,7 @@ uint8_t rst = 9;   //LoRa Reset Pin
 struct data_encrypt {
   uint8_t id = 0x00;
   uint8_t sampeUI8 = 0x00;
-  float sampleF = 00.000000;
-  String sampleS = "EMPTY";
+  double sampleF = 0.00;
 };
 
 typedef struct data_encrypt Data_en;
@@ -73,8 +72,10 @@ void loop() {
   if (packetSize)  // Only read if there is some data to read..
   {
     LoRa.readBytes((uint8_t *)&payload, packetSize);
-    Serial.println("Received packet:");
+    Serial.println("**********************************");
+    Serial.print("Received packet:");
     Serial.write((uint8_t *)&payload, sizeof(payload));
+    Serial.println("\n**********************************");
     Serial.print("\n\n\n");
     Serial.println("###############################");
     Serial.println("Data Decryption Test\n\n");
@@ -83,9 +84,10 @@ void loop() {
     Serial.print("Data Sample UINT8_T: ");
     Serial.println(payload.sampeUI8, HEX);
     Serial.print("Data Sample Float: ");
-    Serial.println(payload.sampleF);
-    Serial.print("Data Sample String:");
-    Serial.println(payload.sampleS);
+    Serial.println(payload.sampleF, 6);
+    //Serial.print("Data Sample String:");
+    //Serial.println(payload.sampleS);
     Serial.println("###############################");
+    Serial.println("\n\n\n\n\n\n");
   }
 }
