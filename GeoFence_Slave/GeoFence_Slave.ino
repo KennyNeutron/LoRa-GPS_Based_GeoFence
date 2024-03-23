@@ -104,26 +104,28 @@ void setup() {
 void loop() {
   gps_loop();
 
-  Serial.print("\n\n\nSending packet: ");
-  Serial.write((uint8_t*)&payload, sizeof(payload));
+  //Serial.print("\n\n\nSending packet: ");
+  //Serial.write((uint8_t*)&payload, sizeof(payload));
 
-
-  // send packet
-  LoRa.beginPacket();
-  LoRa.write((uint8_t*)&payload, sizeof(payload));
-  LoRa.endPacket();
-
-  delay(2000);
-
-
-  iter++;
-
-  payload.count=iter;
-  /*
   if (valid_location) {
+    // send packet
+    LoRa.beginPacket();
+    LoRa.write((uint8_t*)&payload, sizeof(payload));
+    LoRa.endPacket();
+
+    delay(2000);
+
+
+    iter++;
+  }
+
+
+  payload.count = iter;
+  /*
+    if (valid_location) {
     digitalWrite(LEDloc, 1);
     Serial.println("Valid Loc");
-  } else {
+    } else {
     digitalWrite(LEDloc, 0);
-  }*/
+    }*/
 }

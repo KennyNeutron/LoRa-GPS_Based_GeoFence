@@ -1,22 +1,36 @@
+#include <SPI.h>
+#include <LoRa.h>
+
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 
+#include "variables.h"
+
 SoftwareSerial GeoSerial(3, 4);
 
-uint32_t ihap = 0;
-uint8_t GeoSerialDATA = 0xFF;
+#define pi 3.14159265358979323846
 
-uint16_t NumberOfBytesToRead = 0;
+uint8_t ss = 10;    //LoRa SPI Chip Select Pin
+uint8_t dio0 = 2;   //LoRa DIO0 Pin
+uint8_t rst = 9;    //LoRa Reset Pin
 
-char ch_GeoSerialDATA[100] = "";
 
-float GeoFenceMidPoint_Latitude = 0.00;
-float GeoFenceMidPoint_Longitude = 0.00;
-uint16_t GeoFenceRadius = 0;
+struct data_encrypt {
+  uint8_t header0 = 0xFF;
+  uint8_t header1 = 0xFF;
+  uint32_t id = 0xFFFFFFFF;
+  bool LocationValid = false;
+  float slaveLat = 0.00;
+  float slaveLon = 0.00;
+  uint32_t count = 0;
+  uint8_t footer = 0xFF;
+};
 
-String str_GeoFenceMidPoint_Latitude = "";
-String str_GeoFenceMidPoint_Longitude = "";
-String str_GeoFenceRadius = "";
+typedef struct data_encrypt Data_en;
+
+Data_en payload;
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -39,6 +53,16 @@ void setup() {
   Serial.println("=======================");
   DecodeToFloat();
   Serial.println("=======================");
+
+
+  Serial.println("LoRa Receiver");
+
+  LoRa.setPins(ss, rst, dio0);
+
+  if (!LoRa.begin(433E6)) { //use (915E6) for LoRa Ra-02 915 MHz
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
 
 }
 
@@ -81,7 +105,64 @@ void loop() {
 
 
 
+  int packetSize = LoRa.parsePacket();
+  if (packetSize)  // Only read if there is some data to read..
+  {
+    LoRa.readBytes((uint8_t *)&payload, packetSize);
+    Serial.println("**********************************");
+    Serial.print("Received packet:");
+    Serial.write((uint8_t *)&payload, sizeof(payload));
+    Serial.println("\n**********************************");
+    Serial.println("###############################");
+    Serial.println("Data Decryption Test\n\n");
+    Serial.print("Data ID: ");
+    Serial.println(payload.id, HEX);
+    Serial.print("Count:");
+    Serial.println(payload.count);
+    Serial.print("HEADE0:");
+    Serial.println(payload.header0, HEX);
+    Serial.print("HEADER1:");
+    Serial.println(payload.header1, HEX);
+    Serial.print("Location Valid:");
+    Serial.println(payload.LocationValid);
+    Serial.print("Data Sample Latitude: ");
+    Serial.println(payload.slaveLat, 6);
+    Serial.print("Data Sample Longitude: ");
+    Serial.println(payload.slaveLon, 6);
+    Serial.print("FOOTER:");
+    Serial.println(payload.footer, HEX);
+    if (payload.header0 == 0xAA && payload.header1 == 0xAB && payload.footer == 0xBB) {
+      Serial.print("Sample Link: https://maps.google.com/?q=");
+      Serial.print(payload.slaveLat, 6);
+      Serial.print(",");
+      Serial.println(payload.slaveLon, 6);
+    }
+    Serial.println("###############################");
+    Serial.println("\n\n\n\n\n\n");
+
+    if (payload.LocationValid) {
+      Serial.print("SLAVE DISTANCE FROM MIDPOINT:");
+      Serial.print(calculateDistance(GeoFenceMidPoint_Latitude, GeoFenceMidPoint_Longitude, payload.slaveLat, payload.slaveLon));
+      Serial.println(" meters");
+    } else {
+      Serial.println("INVALID LOCATION cannot determine Distance from Midpoint");
+    }
+
+
+  }
+
+
+
 }
+
+float calculateDistance(float lat1, float long1, float lat2, float long2) {
+  float dist;
+  dist = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(long1 - long2);
+  dist = acos(dist);
+  dist = (6371 * pi * dist) / 180;
+  return dist * 1000;
+}
+
 
 
 void SaveToEEPROM() {
