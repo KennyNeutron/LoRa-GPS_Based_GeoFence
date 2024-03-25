@@ -14,10 +14,25 @@ void DecodeToFloat() {
 
   b++;
 
-  while (ch_GeoSerialDATA[b] != 'B') {
+  while (ch_GeoSerialDATA[b] != ',') {
     str_GeoFenceRadius = str_GeoFenceRadius + ch_GeoSerialDATA[b];
     b++;
   }
+
+  b++;
+
+  while (ch_GeoSerialDATA[b] != ',') {
+    str_DeviceID_Recieved = str_DeviceID_Recieved + ch_GeoSerialDATA[b];
+    b++;
+  }
+
+  b++;
+
+  while (ch_GeoSerialDATA[b] != 'B') {
+    str_DevicePW_Recieved = str_DevicePW_Recieved + ch_GeoSerialDATA[b];
+    b++;
+  }
+
 
   Serial.print("STR Lat:");
   Serial.println(str_GeoFenceMidPoint_Latitude);
@@ -25,6 +40,10 @@ void DecodeToFloat() {
   Serial.println(str_GeoFenceMidPoint_Longitude);
   Serial.print("STR Rad:");
   Serial.println(str_GeoFenceRadius);
+  Serial.print("STR Device ID Recieved:");
+  Serial.println(str_DeviceID_Recieved);
+  Serial.print("STR Device PIN Code Recieved:");
+  Serial.println(str_DevicePW_Recieved);
 
   GeoFenceMidPoint_Latitude = str_GeoFenceMidPoint_Latitude.toFloat();
   GeoFenceMidPoint_Longitude = str_GeoFenceMidPoint_Longitude.toFloat();
@@ -40,4 +59,6 @@ void DecodeToFloat() {
   str_GeoFenceMidPoint_Latitude = "";
   str_GeoFenceMidPoint_Longitude = "";
   str_GeoFenceRadius = "";
+  str_DeviceID_Recieved = "";
+  str_DevicePW_Recieved = "";
 }
