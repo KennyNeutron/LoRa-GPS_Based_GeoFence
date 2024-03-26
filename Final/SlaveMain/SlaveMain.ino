@@ -127,8 +127,34 @@ void setup() {
 
   LoRa_last_millis = millis();
 
-  Serial.println("Stored EEPROM data= " + String(EEPROM.read(0)) + "bytes");
-  Serial.println("RETRIEVING DATA...");
+  Serial.println("Retrieving Data from EEPROM...");
+  if (EEPROM.read(100) == true) {
+    Serial.println("THIS DEVICE IS PAIRED");
+    Serial.print("Slave Assignment:");
+    Serial.println(EEPROM.read(101));
+
+    DevicePaired = true;
+    ThisDevice_SlaveAssignment = EEPROM.read(101);
+
+    float fLat = 0.00f;
+    Serial.print("GeoFence Midpoint Latitude:");
+    Serial.println(EEPROM.get(0, fLat), 6);
+
+    float fLon = 0.00f;
+    Serial.print("GeoFence Midpoint Longitude:");
+    Serial.println(EEPROM.get(20, fLon), 6);
+
+    uint16_t uRad = 0;
+    Serial.print("GeoFence Radius:");
+    Serial.println(EEPROM.get(40, uRad));
+
+    GeoFenceMid_Lat = fLat;
+    GeoFenceMid_Lon = fLon;
+    GeoFence_Rad = uRad;
+
+  } else {
+    Serial.println("THIS DEVICE IS NOT PAIRED");
+  }
 }
 
 void loop() {
@@ -176,64 +202,12 @@ void loop() {
       GeoFenceMid_Lat = MasterPayload.GeofenceMidpoint_Lat;
       GeoFenceMid_Lon = MasterPayload.GeofenceMidpoint_Lon;
       GeoFence_Rad = MasterPayload.GeofenceRad;
-
-      String str_GeoFenceMidPoint_Latitude = String(GeoFenceMid_Lat, 6);
-      String str_GeoFenceMidPoint_Longitude = String(GeoFenceMid_Lon, 6);
-      ;
-      //str_GeoFenceRadius = String(GeoFence_Rad);
-
       Serial.println("##############################################");
-
-      char char_GeoFenceMidPoint_Latitude[] = "";
-      char char_GeoFenceMidPoint_Longitude[] = "";
-      char char_GeoFenceRadius[] = "";
-
-      dtostrf(GeoFenceMid_Lat, 6, 2, char_GeoFenceMidPoint_Latitude);
-      dtostrf(GeoFenceMid_Lon, 6, 2, char_GeoFenceMidPoint_Longitude);
-
-      String str_GeoFenceRadius = String(GeoFence_Rad);
-
-      str_GeoFenceRadius.toCharArray(char_GeoFenceRadius, str_GeoFenceRadius.length() + 1);
-
-      Serial.print("STR GeoMid Lat:");
-      Serial.println(char_GeoFenceMidPoint_Latitude);
-      Serial.print("STR GeoMid Lon:");
-      Serial.println(char_GeoFenceMidPoint_Longitude);
-      Serial.print("STR Geofence Radius:");
-      Serial.println(char_GeoFenceRadius);
-
-      /*
-      char ch_DataFromMaster[]="";
-      strcpy (ch_DataFromMaster,char_GeoFenceMidPoint_Latitude);
-      strcat(ch_DataFromMaster,char_GeoFenceMidPoint_Longitude);
-
-      Serial.print("Data from Master:");
-      Serial.println(ch_DataFromMaster);*/
-
-      /*
-      Serial.print("STR GeoMid Lat:");
-      Serial.println(str_GeoFenceMidPoint_Latitude);
-      Serial.print("STR GeoMid Lon:");
-      Serial.println(str_GeoFenceMidPoint_Longitude);
-      Serial.print("STR Geofence Radius:");
-      Serial.println(str_GeoFenceRadius);
-
-
-      DataFromMaster = "A" + str_GeoFenceMidPoint_Latitude + "," + str_GeoFenceMidPoint_Longitude + "," + str_GeoFenceRadius;
-      Serial.print("Data From Master:");
-      Serial.println(DataFromMaster);
-      DataSize = DataFromMaster.length();
-      Serial.print("DataSize:");
-      Serial.println(DataSize);
-      */
-
-      //Serial.println("DONE SAVING " + String(DataSize) + "bytes of data to EEPROM");
-
-      /*
-      if (DataSize > 0) {
-        EEPROM.write(0, DataSize);
-      }*/
-
+      EEPROM.put(0, GeoFenceMid_Lat);
+      EEPROM.put(20, GeoFenceMid_Lon);
+      EEPROM.put(40, GeoFence_Rad);
+      EEPROM.write(100, DevicePaired);
+      EEPROM.write(101, ThisDevice_SlaveAssignment);
       Serial.println("##############################################");
     }
   }

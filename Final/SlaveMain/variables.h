@@ -29,9 +29,7 @@ float DistanceFrom_GeoFenceMidpoint = 0.0;
 
 String str_GeoFenceMidPoint_Latitude = "";
 String str_GeoFenceMidPoint_Longitude = "";
-//String str_GeoFenceRadius = "";
+String str_GeoFenceRadius = "";
 String str_DeviceID = "";
 String str_DevicePW = "";
 
-String DataFromMaster = "";
-uint8_t DataSize = 0;
