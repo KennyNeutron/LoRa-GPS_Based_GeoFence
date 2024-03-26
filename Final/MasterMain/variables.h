@@ -14,5 +14,10 @@ uint16_t GeoFenceRadius = 0;
 String str_GeoFenceMidPoint_Latitude = "";
 String str_GeoFenceMidPoint_Longitude = "";
 String str_GeoFenceRadius = "";
-String str_DeviceID_Recieved="";
-String str_DevicePW_Recieved="";
+String str_DeviceID_Recieved = "";
+String str_DevicePW_Recieved = "";
+
+
+char SlaveID_fromMaster[6] = "xxxxxx";
+char SlavePW_fromMaster[5] = "0000";
+bool PairCommand_fromApp = false;

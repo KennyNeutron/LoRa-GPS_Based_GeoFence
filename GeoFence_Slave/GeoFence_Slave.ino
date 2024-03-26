@@ -43,22 +43,22 @@ String gps_lon = " ";
 uint32_t iter = 0;
 
 
-struct data_encrypt {
-  uint8_t header0 = 0xAA;
-  uint8_t header1 = 0xAB;
-  uint8_t id = 0x01;
+struct SlaveData_encrypt {
+  uint8_t header0 = 0xFF;
+  uint8_t header1 = 0xFF;
+  uint32_t id = 0xFFFFFFFF;
   bool LocationValid = false;
-  float slaveLat = gps.location.lat();
-  float slaveLon = gps.location.lng();
-  uint32_t count = iter;
-  uint8_t footer = 0xBB;
+  float slaveLat = 0.00;
+  float slaveLon = 0.00;
+  uint32_t count = 0;
+  uint8_t footer = 0xFF;
 };
 
-typedef struct data_encrypt Data_en;
+typedef struct SlaveData_encrypt SlaveData_en;
 
-Data_en payload;
+SlaveData_en SlavePayload;
 
-int datasize = sizeof(struct data_encrypt);
+int datasize = sizeof(struct SlaveData_encrypt);
 
 int counter = 0;
 
@@ -84,19 +84,19 @@ void setup() {
   Serial.println("###############################");
   Serial.println("Data Encryption Test\n\n");
   Serial.print("Data ID: ");
-  Serial.println(payload.id);
+  Serial.println(SlavePayload.id);
   Serial.print("HEADE0:");
-  Serial.println(payload.header0, HEX);
+  Serial.println(SlavePayload.header0, HEX);
   Serial.print("HEADER1:");
-  Serial.println(payload.header1, HEX);
+  Serial.println(SlavePayload.header1, HEX);
   Serial.print("Location Valid:");
-  Serial.println(payload.LocationValid);
+  Serial.println(SlavePayload.LocationValid);
   Serial.print("Data Sample Latitude: ");
-  Serial.println(payload.slaveLat, 6);
+  Serial.println(SlavePayload.slaveLat, 6);
   Serial.print("Data Sample Longitude: ");
-  Serial.println(payload.slaveLon, 6);
+  Serial.println(SlavePayload.slaveLon, 6);
   Serial.print("FOOTER:");
-  Serial.println(payload.footer, HEX);
+  Serial.println(SlavePayload.footer, HEX);
   Serial.println("###############################");
   digitalWrite(LEDloc, 0);
 }
@@ -110,7 +110,7 @@ void loop() {
   if (valid_location) {
     // send packet
     LoRa.beginPacket();
-    LoRa.write((uint8_t*)&payload, sizeof(payload));
+    LoRa.write((uint8_t*)&SlavePayload, sizeof(SlavePayload));
     LoRa.endPacket();
 
     delay(2000);
@@ -120,7 +120,7 @@ void loop() {
   }
 
 
-  payload.count = iter;
+  SlavePayload.count = iter;
   /*
     if (valid_location) {
     digitalWrite(LEDloc, 1);

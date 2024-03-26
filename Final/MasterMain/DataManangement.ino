@@ -28,11 +28,22 @@ void DecodeToFloat() {
 
   b++;
 
-  while (ch_GeoSerialDATA[b] != 'B') {
+  while (1) {
     str_DevicePW_Recieved = str_DevicePW_Recieved + ch_GeoSerialDATA[b];
+    if (ch_GeoSerialDATA[b] == 'B'||ch_GeoSerialDATA[b] == 'C') {
+      goto endSetup;
+    }
     b++;
   }
 
+endSetup:
+  if (ch_GeoSerialDATA[b] == 'B') {
+    PairCommand_fromApp = true;
+    Serial.println("Pairing Command!");
+  } else if (ch_GeoSerialDATA[b] == 'C') {
+    PairCommand_fromApp = false;
+    Serial.println("Terminate Command!");
+  }
 
   Serial.print("STR Lat:");
   Serial.println(str_GeoFenceMidPoint_Latitude);
@@ -55,6 +66,9 @@ void DecodeToFloat() {
   Serial.println(GeoFenceMidPoint_Longitude, 7);
   Serial.print("Int Rad:");
   Serial.println(GeoFenceRadius);
+
+  str_DeviceID_Recieved.toCharArray(SlaveID_fromMaster, 7);
+  str_DevicePW_Recieved.toCharArray(SlavePW_fromMaster,5);
 
   str_GeoFenceMidPoint_Latitude = "";
   str_GeoFenceMidPoint_Longitude = "";

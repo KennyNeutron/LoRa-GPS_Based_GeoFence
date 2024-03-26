@@ -23,16 +23,16 @@ void displayInfo() {
   if (gps.location.isValid()) {
     Serial.print(gps.location.lat(), 6);
     gps_lat = String(gps.location.lat(), 6);
-    payload.slaveLat = gps.location.lat();
+    SlavePayload.slaveLat = gps.location.lat();
     Serial.print(F(","));
     Serial.print(gps.location.lng(), 6);
     gps_lon = String(gps.location.lng(), 6);
-    payload.slaveLon = gps.location.lng();
+    SlavePayload.slaveLon = gps.location.lng();
     valid_location = true;
   } else {
     Serial.println(F("INVALID"));
     valid_location = false;
   }
 
-  payload.LocationValid = valid_location;
+  SlavePayload.LocationValid = valid_location;
 }

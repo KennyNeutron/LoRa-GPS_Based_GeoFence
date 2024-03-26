@@ -20,29 +20,29 @@ void gps_loop() {
 
 
 void displayInfo() {
-  Serial.println("GPS available... getting info...");
-  Serial.print(F("Location: "));
+  //Serial.println("GPS available... getting info...");
+  //Serial.print(F("Location: "));
   if (gps.location.isValid()) {
-    Serial.print(gps.location.lat(), 6);
+    //Serial.print(gps.location.lat(), 6);
     gps_lat = String(gps.location.lat(), 6);
-    payload.slaveLat = gps.location.lat();
-    Serial.print(F(","));
-    Serial.print(gps.location.lng(), 6);
+    SlavePayload.slaveLat = gps.location.lat();
+    //Serial.print(F(","));
+    //Serial.print(gps.location.lng(), 6);
     gps_lon = String(gps.location.lng(), 6);
-    payload.slaveLon = gps.location.lng();
+    SlavePayload.slaveLon = gps.location.lng();
     valid_location = true;
 
     GPS_Lat = gps.location.lat();
     GPS_Lon = gps.location.lng();
 
-    payload.LocationValid = true;
+    SlavePayload.LocationValid = true;
   } else {
-    Serial.println(F("INVALID"));
+    //Serial.println(F("INVALID"));
     valid_location = false;
 
     GPS_Lat = 0.0;
     GPS_Lon = 0.0;
-    payload.LocationValid = false;
+    SlavePayload.LocationValid = false;
   }
 
 
