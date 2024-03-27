@@ -154,6 +154,7 @@ void loop() {
     Serial.println(SlavePayload.slaveLon, 6);
     Serial.print("FOOTER:");
     Serial.println(SlavePayload.footer, HEX);
+    /*
     if (SlavePayload.SlaveAssignment == 100) {
       Serial.println("GEOSERIAL:SLAVEXXX");
       GeoSerial.print("SLAVEXXX");
@@ -161,6 +162,7 @@ void loop() {
       Serial.println("GEOSERIAL:SLAVE" + String(SlavePayload.SlaveAssignment));
       GeoSerial.print("SLAVE" + String(SlavePayload.SlaveAssignment));
     }
+    */
 
     if (SlavePayload.header0 == 0xAA && SlavePayload.header1 == 0xAB && SlavePayload.footer == 0xBB) {
       Serial.print("Sample Link: https://maps.google.com/?q=");
@@ -175,6 +177,16 @@ void loop() {
       Serial.print("SLAVE DISTANCE FROM MIDPOINT:");
       Serial.print(calculateDistance(GeoFenceMidPoint_Latitude, GeoFenceMidPoint_Longitude, SlavePayload.slaveLat, SlavePayload.slaveLon));
       Serial.println(" meters");
+      if (SlavePayload.SlaveAssignment == 100) {
+        GeoSerial.print("SLAVEXXX");
+      } else {
+        GeoSerial.print("SLAVE");
+        GeoSerial.print(String(SlavePayload.SlaveAssignment));
+      }
+      GeoSerial.print(",");
+      GeoSerial.print(SlavePayload.slaveLat, 6);
+      GeoSerial.print(",");
+      GeoSerial.print(SlavePayload.slaveLon, 6);
     } else {
       Serial.println("INVALID LOCATION cannot determine Distance from Midpoint");
     }
