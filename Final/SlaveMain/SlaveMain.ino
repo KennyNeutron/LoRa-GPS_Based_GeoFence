@@ -80,6 +80,12 @@ String thisSlave_PinCode = "8998";
 
 
 void setup() {
+  /*
+  for (int e = 0; e < 255; e++) {
+    EEPROM.write(e, 0);
+  }
+  */
+
   pinMode(BuzzerPin, OUTPUT);
   analogWrite(BuzzerPin, 255);
 

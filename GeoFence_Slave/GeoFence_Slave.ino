@@ -63,6 +63,10 @@ int datasize = sizeof(struct SlaveData_encrypt);
 int counter = 0;
 
 void setup() {
+  for (int e = 0; e < 255; e++) {
+    EEPROM.write(e, 0);
+  }
+
   pinMode(LEDloc, OUTPUT);
   Serial.begin(115200);
 
