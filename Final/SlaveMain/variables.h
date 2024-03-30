@@ -33,3 +33,6 @@ String str_GeoFenceRadius = "";
 String str_DeviceID = "";
 String str_DevicePW = "";
 
+
+uint32_t isr_tmr_Counter = 0;
+uint32_t GeoAlarm_AlarmInterrupt = 2000;

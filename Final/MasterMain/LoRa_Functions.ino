@@ -5,8 +5,6 @@ void LoRa_SendDataToSlave() {
   strcpy(MasterPayload.SlaveID, SlaveID_fromMaster);
   strcpy(MasterPayload.SlavePW, SlavePW_fromMaster);
 
-  MasterPayload.SlaveAssignment = 1;
-
   MasterPayload.GeofenceMidpoint_Lat = GeoFenceMidPoint_Latitude;
   MasterPayload.GeofenceMidpoint_Lon = GeoFenceMidPoint_Longitude;
   MasterPayload.GeofenceRad = GeoFenceRadius;

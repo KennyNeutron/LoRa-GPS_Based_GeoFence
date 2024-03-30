@@ -1,5 +1,6 @@
 
 void BuzzAlarm() {
+  /*
   if (DevicePaired) {
     if (!BuzzerToggle) {
       analogWrite(BuzzerPin, 100);
@@ -12,5 +13,5 @@ void BuzzAlarm() {
         BuzzerToggle = false;
       }
     }
-  }
+  }*/
 }

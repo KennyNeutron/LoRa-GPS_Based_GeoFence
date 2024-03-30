@@ -75,8 +75,8 @@ struct MasterData_encrypt {
 typedef struct MasterData_encrypt MasterData_en;
 MasterData_en MasterPayload;
 
-String thisSlave_ID = "xxyyzz";
-String thisSlave_PinCode = "1234";
+String thisSlave_ID = "aabbcc";
+String thisSlave_PinCode = "1122";
 
 
 void setup() {
@@ -161,6 +161,7 @@ void setup() {
   } else {
     Serial.println("THIS DEVICE IS NOT PAIRED");
   }
+  GeoFenceInterrupt();
 }
 
 void loop() {
@@ -297,6 +298,14 @@ void loop() {
 
   } while (u8g.nextPage());
   //===============================================================
+
+  if (DistanceFrom_GeoFenceMidpoint > GeoFence_Rad) {
+    Serial.println("Great");
+    GeoAlarm_AlarmInterrupt = 250;
+  } else {
+    Serial.println("Less");
+    GeoAlarm_AlarmInterrupt = 2000;
+  }
 }
 
 float calculateDistance(float lat1, float long1, float lat2, float long2) {

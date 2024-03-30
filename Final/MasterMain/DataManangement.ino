@@ -30,7 +30,10 @@ void DecodeToFloat() {
 
   while (1) {
     str_DevicePW_Recieved = str_DevicePW_Recieved + ch_GeoSerialDATA[b];
-    if (ch_GeoSerialDATA[b] == 'B'||ch_GeoSerialDATA[b] == 'C') {
+    if (ch_GeoSerialDATA[b] == 'B' || ch_GeoSerialDATA[b] == 'C') {
+      Serial.print("SLAVE ASSIGNMENT:");
+      Serial.println(ch_GeoSerialDATA[b - 1], DEC);
+      MasterPayload.SlaveAssignment = ch_GeoSerialDATA[b - 1]-'0';
       goto endSetup;
     }
     b++;
@@ -68,7 +71,7 @@ endSetup:
   Serial.println(GeoFenceRadius);
 
   str_DeviceID_Recieved.toCharArray(SlaveID_fromMaster, 7);
-  str_DevicePW_Recieved.toCharArray(SlavePW_fromMaster,5);
+  str_DevicePW_Recieved.toCharArray(SlavePW_fromMaster, 5);
 
   str_GeoFenceMidPoint_Latitude = "";
   str_GeoFenceMidPoint_Longitude = "";
