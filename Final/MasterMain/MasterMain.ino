@@ -155,7 +155,7 @@ void loop() {
     Serial.print("FOOTER:");
     Serial.println(SlavePayload.footer, HEX);
     
-    if (SlavePayload.SlaveAssignment == 100) {
+    if (SlavePayload.SlaveAssignment == 99) {
       Serial.println("GEOSERIAL:SLAVEXXX");
       GeoSerial.print("SLAVEXXX");
     }

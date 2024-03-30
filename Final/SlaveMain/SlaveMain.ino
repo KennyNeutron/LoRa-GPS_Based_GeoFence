@@ -166,7 +166,7 @@ void setup() {
 }
 
 void loop() {
-  
+
   BuzzAlarm();
   gps_loop();
 
@@ -244,7 +244,7 @@ void loop() {
   //reply to terminate
   if (ReplyTerminate) {
     Serial.println("Sending LoRa Packet");
-    SlavePayload.SlaveAssignment = 100;
+    SlavePayload.SlaveAssignment = 99;
 
     LoRa.beginPacket();
     LoRa.write((uint8_t *)&SlavePayload, sizeof(SlavePayload));
