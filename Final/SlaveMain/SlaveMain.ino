@@ -161,10 +161,12 @@ void setup() {
   } else {
     Serial.println("THIS DEVICE IS NOT PAIRED");
   }
+
   GeoFenceInterrupt();
 }
 
 void loop() {
+  
   BuzzAlarm();
   gps_loop();
 
@@ -300,11 +302,11 @@ void loop() {
   //===============================================================
 
   if (DistanceFrom_GeoFenceMidpoint > GeoFence_Rad) {
-    Serial.println("Great");
-    GeoAlarm_AlarmInterrupt = 250;
+    //Serial.println("Great");
+    GeoAlarm_AlarmInterrupt = 500;
   } else {
-    Serial.println("Less");
-    GeoAlarm_AlarmInterrupt = 2000;
+    //Serial.println("Less");
+    GeoAlarm_AlarmInterrupt = 8000;
   }
 }
 

@@ -154,15 +154,11 @@ void loop() {
     Serial.println(SlavePayload.slaveLon, 6);
     Serial.print("FOOTER:");
     Serial.println(SlavePayload.footer, HEX);
-    /*
+    
     if (SlavePayload.SlaveAssignment == 100) {
       Serial.println("GEOSERIAL:SLAVEXXX");
       GeoSerial.print("SLAVEXXX");
-    } else {
-      Serial.println("GEOSERIAL:SLAVE" + String(SlavePayload.SlaveAssignment));
-      GeoSerial.print("SLAVE" + String(SlavePayload.SlaveAssignment));
     }
-    */
 
     if (SlavePayload.header0 == 0xAA && SlavePayload.header1 == 0xAB && SlavePayload.footer == 0xBB) {
       Serial.print("Sample Link: https://maps.google.com/?q=");
