@@ -5,6 +5,9 @@
 #include <LCDWIKI_KBV.h>  //Hardware-specific library
 #include <XPT2046_Touchscreen.h>
 
+
+#include <EEPROM.h>
+#include <Wire.h>
 #include <SoftwareSerial.h>
 
 #include "variables.h"
@@ -47,6 +50,9 @@ SoftwareSerial MasterSerial(10, 11);
 
 uint16_t currentScreen = 0;
 
+int dataIIC = 0;
+
+bool I2CRecieved = false;
 
 void setup() {
   Serial.begin(9600);
@@ -75,8 +81,47 @@ void setup() {
   // delay(2000);
 
   currentScreen = Screen_Main;
+  Wire.begin(9);
+  // Attach a function to trigger when something is received.
+  Wire.onReceive(receiveEvent);
+
+  float fLat = 0.00f;
+  Serial.print("GeoFence Midpoint Latitude:");
+  Serial.println(EEPROM.get(0, fLat), 6);
+
+  float fLon = 0.00f;
+  Serial.print("GeoFence Midpoint Longitude:");
+  Serial.println(EEPROM.get(20, fLon), 6);
+
+  uint16_t uRad = 0;
+  Serial.print("GeoFence Radius:");
+  Serial.println(EEPROM.get(40, uRad));
+
+  GeoFenceMidPoint_Latitude = fLat;
+  GeoFenceMidPoint_Longitude = fLon;
+  GeoFenceRadius = uRad;
+
+  for (int x = 1; x <= 6; x++) {
+    SlaveStatus[x] = EEPROM.read(x + 100);
+    Serial.println("STATUS Slave [" + String(x) + "]:" + String(SlaveStatus[x]));
+  }
+  last_millis = millis();
 }
 
+
+void receiveEvent(int bytes) {
+  uint8_t count = 0;
+  while (Wire.available())  // loop through data received
+  {
+    char c = Wire.read();  // receive byte as a byte
+    // Serial.print("I2C DATA[" + String(count) + "]: 0x");
+    Serial.println(c, HEX);
+    ch_GeoSerialDATA[count] = c;
+    count++;
+  }
+  I2CRecieved = true;
+  last_millis = millis();
+}
 void loop() {
   switch (currentScreen) {
     case Screen_Main:
@@ -87,22 +132,48 @@ void loop() {
       break;
   }
 
-  if (MasterSerial.available() > 0) {
-    Serial.println("RECIEVED");
-    MasterSerialDATA = MasterSerial.read();
-    Serial.println(MasterSerialDATA, DEC);
-
-    if (MasterSerialDATA == 0xAA) {
-      Serial.println("HEAD");
-      MasterSerialDATA = MasterSerial.read();
-      NumberOfBytesToRead = MasterSerialDATA;
-      MasterSerialDATA = MasterSerial.read();
-      if (MasterSerialDATA == 0xAB) {
-        Serial.println("FOOT");
-        Serial.println("Bytes to READ:" + String(NumberOfBytesToRead));
-      }
+  if (I2CRecieved == true) {
+    switch (ch_GeoSerialDATA[0]) {
+      case 0xFFFFFFAA:
+        DecodeGeofenceData();
+        SaveToEEPROM();
+        break;
+      case 0xFFFFFFAB:
+        GeoFenceMidPoint_Latitude = 0.00;
+        GeoFenceMidPoint_Longitude = 0.00;
+        GeoFenceRadius = 0;
+        SaveToEEPROM();
+        break;
+      case 0xFFFFFFBB:
+        SlaveMeddle[ch_GeoSerialDATA[1]] = true;
+        AlarmType[ch_GeoSerialDATA[1]] = ch_GeoSerialDATA[2];
+        break;
+      default:
+        delay(10);
+        break;
     }
+    I2CRecieved = false;
   }
+
+  if (millis() - last_millis >= 10000) {
+    ResetMeddle();
+    last_millis = millis();
+  }
+}
+
+void ResetMeddle() {
+  for (int i = 0; i < 7; i++) {
+    SlaveMeddle[i] = false;
+    AlarmType[i] = false;
+  }
+}
+
+void SaveToEEPROM() {
+  Serial.println("##############################################");
+  EEPROM.put(0, GeoFenceMidPoint_Latitude);
+  EEPROM.put(20, GeoFenceMidPoint_Longitude);
+  EEPROM.put(40, GeoFenceRadius);
+  Serial.println("##############################################");
 }
 
 void display_LoadingScreen() {

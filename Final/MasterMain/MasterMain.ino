@@ -1,18 +1,21 @@
 #include <SPI.h>
 #include <LoRa.h>
-
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
+#include <Wire.h>
 
 #include "variables.h"
 
 SoftwareSerial GeoSerial(3, 4);
+
 
 #define pi 3.14159265358979323846
 
 uint8_t ss = 10;   //LoRa SPI Chip Select Pin
 uint8_t dio0 = 2;  //LoRa DIO0 Pin
 uint8_t rst = 9;   //LoRa Reset Pin
+
+#define buzzerPin 6
 
 
 struct SlaveData_encrypt {
@@ -49,10 +52,21 @@ int MasterDataSize = sizeof(struct MasterData_encrypt);
 
 
 void setup() {
+  // //init EEPROM for Slave Pairing
+  // EEPROM.write(101,false);
+  // EEPROM.write(102,false);
+  // EEPROM.write(103,false);
+  // EEPROM.write(104,false);
+  // EEPROM.write(105,false);
+  // EEPROM.write(106,false);
+  pinMode(buzzerPin, OUTPUT);
   Serial.begin(9600);
   GeoSerial.begin(9600);
   Serial.println("GeoFence MASTER DEVICE\n\n\nSystem Starting\n\n\n");
-
+  for (int x = 1; x <= 6; x++) {
+    SlaveStatus[x] = EEPROM.read(x + 100);
+    Serial.println("STATUS Slave [" + String(x) + "]:" + String(SlaveStatus[x]));
+  }
   for (int i = 0; i <= 10; i++) {
     digitalWrite(13, 1);
     delay(100);
@@ -80,10 +94,14 @@ void setup() {
     while (1)
       ;
   }
+
+  Wire.begin();
+  GeoFenceInterrupt();
 }
 
 
 void loop() {
+
 
   if (GeoSerial.available() > 0) {
     Serial.println("RECIEVED");
@@ -107,6 +125,8 @@ void loop() {
         ch_GeoSerialDATA[i] = GeoSerial.read();
       }
 
+      Serial.println("IIC Data Sent!");
+
       Serial.println("DONE READING " + String(NumberOfBytesToRead) + " DATA");
 
       Serial.print("DATA:");
@@ -122,6 +142,19 @@ void loop() {
       delay(500);
       LoRa_SendDataToSlave();
       delay(500);
+      Serial.println("IIC SENDING DATA1...");
+      Wire.beginTransmission(9);  // transmit to device #9
+      Wire.write(0xAA);
+      Wire.write(EEPROM.read(101));
+      Wire.write(EEPROM.read(102));
+      Wire.write(EEPROM.read(103));
+      Wire.write(EEPROM.read(104));
+      Wire.write(EEPROM.read(105));
+      Wire.write(EEPROM.read(106));
+      for (int count = 1; count < NumberOfBytesToRead - 14; count++) {
+        Wire.write(ch_GeoSerialDATA[count]);
+      }
+      Wire.endTransmission();  // stop transmitting
     }
   }
 
@@ -154,10 +187,13 @@ void loop() {
     Serial.println(SlavePayload.slaveLon, 6);
     Serial.print("FOOTER:");
     Serial.println(SlavePayload.footer, HEX);
-    
+
     if (SlavePayload.SlaveAssignment == 99) {
       Serial.println("GEOSERIAL:SLAVEXXX");
       GeoSerial.print("SLAVEXXX");
+    } else {
+      GeoSerial.print("SLAVE");
+      GeoSerial.print(String(SlavePayload.SlaveAssignment));
     }
 
     if (SlavePayload.header0 == 0xAA && SlavePayload.header1 == 0xAB && SlavePayload.footer == 0xBB) {
@@ -173,19 +209,41 @@ void loop() {
       Serial.print("SLAVE DISTANCE FROM MIDPOINT:");
       Serial.print(calculateDistance(GeoFenceMidPoint_Latitude, GeoFenceMidPoint_Longitude, SlavePayload.slaveLat, SlavePayload.slaveLon));
       Serial.println(" meters");
-      if (SlavePayload.SlaveAssignment == 100) {
+      if (SlavePayload.SlaveAssignment == 99) {
         GeoSerial.print("SLAVEXXX");
-      } else {
-        GeoSerial.print("SLAVE");
-        GeoSerial.print(String(SlavePayload.SlaveAssignment));
       }
       GeoSerial.print(",");
       GeoSerial.print(SlavePayload.slaveLat, 6);
       GeoSerial.print(",");
       GeoSerial.print(SlavePayload.slaveLon, 6);
+
+      DistanceFrom_GeoFenceMidpoint = calculateDistance(GeoFenceMidPoint_Latitude, GeoFenceMidPoint_Longitude, SlavePayload.slaveLat, SlavePayload.slaveLon);
+      AlarmTypeMaster = true;
+      if (DistanceFrom_GeoFenceMidpoint > GeoFenceRadius) {
+        GeoAlarm = true;
+        GeoAlarm_AlarmInterrupt = 2000;
+      } else {
+        GeoAlarm = false;
+        GeoAlarm_AlarmInterrupt = 8000;
+      }
+
+
+      Wire.beginTransmission(9);  // transmit to device #9
+      Wire.write(0xBB);
+      Wire.write(SlavePayload.SlaveAssignment);
+
+      Wire.write(GeoAlarm);
+
+      Wire.endTransmission();  // stop transmitting
     } else {
       Serial.println("INVALID LOCATION cannot determine Distance from Midpoint");
     }
+    alarm_last_millis = millis();
+  }
+
+
+  if (millis() - alarm_last_millis > 10000) {
+    AlarmTypeMaster = false;
   }
 }
 
@@ -206,4 +264,6 @@ void SaveToEEPROM() {
     EEPROM.write(x + 1, ch_GeoSerialDATA[x]);
   }
   Serial.println("DONE SAVING " + String(NumberOfBytesToRead) + "bytes of data to EEPROM");
+
+
 }

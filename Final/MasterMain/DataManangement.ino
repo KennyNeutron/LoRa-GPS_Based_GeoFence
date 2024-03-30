@@ -33,7 +33,8 @@ void DecodeToFloat() {
     if (ch_GeoSerialDATA[b] == 'B' || ch_GeoSerialDATA[b] == 'C') {
       Serial.print("SLAVE ASSIGNMENT:");
       Serial.println(ch_GeoSerialDATA[b - 1], DEC);
-      MasterPayload.SlaveAssignment = ch_GeoSerialDATA[b - 1]-'0';
+      MasterPayload.SlaveAssignment = ch_GeoSerialDATA[b - 1] - '0';
+      currentSlaveAssigment = MasterPayload.SlaveAssignment;
       goto endSetup;
     }
     b++;
@@ -43,9 +44,13 @@ endSetup:
   if (ch_GeoSerialDATA[b] == 'B') {
     PairCommand_fromApp = true;
     Serial.println("Pairing Command!");
+    Serial.println("SLAVE #" + String(currentSlaveAssigment));
+    EEPROM.write(100 + currentSlaveAssigment, PairCommand_fromApp);
   } else if (ch_GeoSerialDATA[b] == 'C') {
     PairCommand_fromApp = false;
     Serial.println("Terminate Command!");
+    Serial.println("SLAVE #" + String(currentSlaveAssigment));
+    EEPROM.write(100 + currentSlaveAssigment, PairCommand_fromApp);
   }
 
   Serial.print("STR Lat:");
