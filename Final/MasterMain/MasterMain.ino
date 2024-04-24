@@ -191,7 +191,13 @@ void loop() {
     if (SlavePayload.SlaveAssignment == 99) {
       Serial.println("GEOSERIAL:SLAVEXXX");
       GeoSerial.print("SLAVEXXX");
+      GeoSerial.print("SLAVEXXX");
+      GeoSerial.print("SLAVEXXX");
     } else {
+      GeoSerial.print("SLAVE");
+      GeoSerial.print(String(SlavePayload.SlaveAssignment));
+      GeoSerial.print("SLAVE");
+      GeoSerial.print(String(SlavePayload.SlaveAssignment));
       GeoSerial.print("SLAVE");
       GeoSerial.print(String(SlavePayload.SlaveAssignment));
     }

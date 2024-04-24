@@ -75,8 +75,8 @@ struct MasterData_encrypt {
 typedef struct MasterData_encrypt MasterData_en;
 MasterData_en MasterPayload;
 
-String thisSlave_ID = "SLA001";
-String thisSlave_PinCode = "1234";
+String thisSlave_ID = "SLA003";
+String thisSlave_PinCode = "9101";
 
 
 void setup() {

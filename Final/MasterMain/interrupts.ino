@@ -24,12 +24,12 @@ ISR(TIMER2_COMPA_vect) {
 
   if (AlarmTypeMaster > 0) {
     if (!BuzzerToggle) {
-      analogWrite(buzzerPin, 100);
+      analogWrite(buzzerPin, 500);
     } else {
-      analogWrite(buzzerPin, 255);
+      analogWrite(buzzerPin, 0);
     }
   } else {
-    analogWrite(buzzerPin, 255);
+    analogWrite(buzzerPin, 0);
   }
 
 
