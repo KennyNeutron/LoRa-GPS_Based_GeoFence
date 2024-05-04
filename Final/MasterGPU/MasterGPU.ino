@@ -45,6 +45,7 @@ LCDWIKI_KBV tft(NT35510, 40, 38, 39, 43, 41);  //model,cs,cd,wr,rd,reset
 #define GREENYELLOW 0xAFE5 /* 173, 255,  47 */
 #define PINK 0xF81F        /* 255,   0, 255 */
 
+#define BluetoothStatusPin 19
 
 SoftwareSerial MasterSerial(10, 11);
 
@@ -106,6 +107,8 @@ void setup() {
     Serial.println("STATUS Slave [" + String(x) + "]:" + String(SlaveStatus[x]));
   }
   last_millis = millis();
+
+  pinMode(BluetoothStatusPin, INPUT);
 }
 
 
@@ -188,4 +191,8 @@ void show_string(String str, int16_t x, int16_t y, uint8_t csize, uint16_t fc, u
   tft.Set_Text_colour(fc);
   tft.Set_Text_Back_colour(bc);
   tft.Print_String(str, x, y);
+}
+
+bool getBluetoothStatus(){
+  return digitalRead(BluetoothStatusPin);
 }

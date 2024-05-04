@@ -30,6 +30,13 @@ void display_Main() {
 
     coordY = coordY + 40;
   }
+
+
+  if (getBluetoothStatus()) {
+    show_string("CONNECTED     ", 150, 380, 2, GREEN, BLACK, 0);
+  } else {
+    show_string("DISCONNECTED", 150, 380, 2, RED, BLACK, 0);
+  }
 }
 
 void displayMain_init() {
@@ -46,4 +53,6 @@ void displayMain_init() {
   show_string("Latitude:", 10, 320, 2, WHITE, WHITE, 0);
   show_string("Longitude:", 10, 340, 2, WHITE, WHITE, 0);
   show_string("Radius:", 10, 360, 2, WHITE, WHITE, 0);
+
+  show_string("App  Status:", 10, 380, 2, WHITE, WHITE, 0);
 }

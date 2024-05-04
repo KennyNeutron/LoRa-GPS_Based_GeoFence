@@ -15,7 +15,7 @@ bool BuzzerToggle = false;
 uint16_t BuzzerInterval = 100;
 
 uint32_t LoRa_last_millis = 0;
-uint32_t LoRa_SendInterval = 10000;
+uint32_t LoRa_SendInterval = 3000;
 
 #define BuzzerPin 5
 bool DevicePaired = false;

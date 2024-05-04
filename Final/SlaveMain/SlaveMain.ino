@@ -75,8 +75,8 @@ struct MasterData_encrypt {
 typedef struct MasterData_encrypt MasterData_en;
 MasterData_en MasterPayload;
 
-String thisSlave_ID = "SLA003";
-String thisSlave_PinCode = "9101";
+String thisSlave_ID = "SLA001";
+String thisSlave_PinCode = "1234";
 
 
 void setup() {
@@ -238,6 +238,7 @@ void loop() {
     Serial.print("SLAVE DISTANCE FROM MIDPOINT:");
     Serial.print(DistanceFrom_GeoFenceMidpoint);
     Serial.println(" meters");
+    Serial.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
   }
   //=================================================
   DistanceFrom_GeoFenceMidpoint = calculateDistance(GeoFenceMid_Lat, GeoFenceMid_Lon, GPS_Lat, GPS_Lon);
