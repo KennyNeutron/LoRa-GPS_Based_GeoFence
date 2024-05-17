@@ -196,10 +196,10 @@ void loop() {
     } else {
       GeoSerial.print("SLAVE");
       GeoSerial.print(String(SlavePayload.SlaveAssignment));
-      GeoSerial.print("SLAVE");
-      GeoSerial.print(String(SlavePayload.SlaveAssignment));
-      GeoSerial.print("SLAVE");
-      GeoSerial.print(String(SlavePayload.SlaveAssignment));
+      // GeoSerial.print("SLAVE");
+      // GeoSerial.print(String(SlavePayload.SlaveAssignment));
+      // GeoSerial.print("SLAVE");
+      // GeoSerial.print(String(SlavePayload.SlaveAssignment));
     }
 
     if (SlavePayload.header0 == 0xAA && SlavePayload.header1 == 0xAB && SlavePayload.footer == 0xBB) {
@@ -243,8 +243,26 @@ void loop() {
       Wire.endTransmission();  // stop transmitting
     } else {
       Serial.println("INVALID LOCATION cannot determine Distance from Midpoint");
+      Wire.beginTransmission(9);  // transmit to device #9
+      Wire.write(0xCC);
+      Wire.write(SlavePayload.SlaveAssignment);
+      Wire.write(GeoAlarm);
+      Wire.endTransmission();  // stop transmitting
+      AlarmTypeMaster = true;
+      if (DistanceFrom_GeoFenceMidpoint > GeoFenceRadius) {
+        GeoAlarm = true;
+        GeoAlarm_AlarmInterrupt = 1000;
+      } else {
+        GeoAlarm = false;
+        GeoAlarm_AlarmInterrupt = 4000
+        ;
+      }
     }
     alarm_last_millis = millis();
+  }
+
+  if(!SlaveStatus[0]&& !SlaveStatus[1] && !!SlaveStatus[2] && !SlaveStatus[3] && !SlaveStatus[4] && !SlaveStatus[5] && !SlaveStatus[6]){
+    AlarmTypeMaster=false;
   }
 
 
@@ -270,6 +288,4 @@ void SaveToEEPROM() {
     EEPROM.write(x + 1, ch_GeoSerialDATA[x]);
   }
   Serial.println("DONE SAVING " + String(NumberOfBytesToRead) + "bytes of data to EEPROM");
-
-
 }

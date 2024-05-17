@@ -72,6 +72,7 @@ struct MasterData_encrypt {
   uint16_t GeofenceRad = 0;
   uint8_t footer = 0xDD;
 };
+
 typedef struct MasterData_encrypt MasterData_en;
 MasterData_en MasterPayload;
 

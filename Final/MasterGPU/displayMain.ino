@@ -28,6 +28,10 @@ void display_Main() {
     }
 
 
+    if (MeddledOnly[y]) {
+      show_string("MEDDLED", 500, coordY, 3, PINK, BLACK, 0);
+      show_string("INVALID     ", 650, coordY, 3, YELLOW, BLACK, 0);
+    }
     coordY = coordY + 40;
   }
 

@@ -149,7 +149,11 @@ void loop() {
         break;
       case 0xFFFFFFBB:
         SlaveMeddle[ch_GeoSerialDATA[1]] = true;
+        MeddledOnly[ch_GeoSerialDATA[1]] = false;
         AlarmType[ch_GeoSerialDATA[1]] = ch_GeoSerialDATA[2];
+        break;
+      case 0xFFFFFFCC:
+        MeddledOnly[ch_GeoSerialDATA[1]] = true;
         break;
       default:
         delay(10);
@@ -168,6 +172,7 @@ void ResetMeddle() {
   for (int i = 0; i < 7; i++) {
     SlaveMeddle[i] = false;
     AlarmType[i] = false;
+    MeddledOnly[i] = false;
   }
 }
 
@@ -193,6 +198,6 @@ void show_string(String str, int16_t x, int16_t y, uint8_t csize, uint16_t fc, u
   tft.Print_String(str, x, y);
 }
 
-bool getBluetoothStatus(){
+bool getBluetoothStatus() {
   return digitalRead(BluetoothStatusPin);
 }

@@ -19,4 +19,6 @@ bool SlaveStatus[7] = { false, false, false, false, false, false, false };
 bool SlaveMeddle[7] = { false, false, false, false, false, false, false };
 bool AlarmType[7] = { false, false, false, false, false, false, false };
 
-uint32_t last_millis=0;
+bool MeddledOnly[7] = { false, false, false, false, false, false, false };
+
+uint32_t last_millis = 0;
